@@ -14,7 +14,9 @@
     "lint:fix": "npm run eslint:fix && npm run format",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
@@ -25,7 +27,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^7.0.2",
+    "husky": "^7.0.0",
     "jest": "^27.1.1",
     "lint-staged": "^11.1.2",
     "prettier": "^2.4.0",
@@ -39,8 +41,9 @@
     }
   },
   "lint-staged": {
-    "./src/**": [
-      "prettier --write ."
+    "src/**/*.{ts,json}": [
+      "npx eslint . --fix",
+      "npx prettier --write ."
     ]
   }
 }

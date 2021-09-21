@@ -15,5 +15,9 @@
     "allowSyntheticDefaultImports": true,
     "removeComments": true,
     "sourceMap": false
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
