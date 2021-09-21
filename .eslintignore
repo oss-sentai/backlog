@@ -1,2 +1,5 @@
+/lib
 node_modules
-lib
+package.json
+package-lock.json
+tsconfig.json
