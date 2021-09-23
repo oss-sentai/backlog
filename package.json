@@ -6,11 +6,11 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
-    "ci": "npm run clean && npm i && npm run lint && npm run cov && npm audit && npm run cov:report",
     "test": "jest",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write 'src/**/*.{ts,json}'",
+    "lint": "npm run eslint && npm run format",
     "lint:fix": "npm run eslint:fix && npm run format",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
