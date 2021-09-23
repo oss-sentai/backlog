@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "clean": "rm -rf lib",
     "test": "jest",
     "eslint": "eslint src/**/*.ts",
@@ -45,5 +45,8 @@
       "npx eslint . --fix",
       "npx prettier --write ."
     ]
+  },
+  "dependencies": {
+    "axios": "^0.21.4"
   }
 }
