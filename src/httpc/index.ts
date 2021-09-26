@@ -17,6 +17,7 @@ export default class HttpClientImpl implements HttpClient {
     'content-Type': 'application/json;charset=utf-8',
   };
   private baseUrl: string;
+  private urlencodedType = 'application/x-www-form-urlencoded';
 
   constructor(config: HttpClientConfig) {
     this.apikey = config.apikey;
@@ -28,6 +29,9 @@ export default class HttpClientImpl implements HttpClient {
   }
   setBearerToken(bearerToken: string): void {
     this.headers.Authorization = 'Bearer ' + bearerToken;
+  }
+  setContentTypeByUrlencoded(): void {
+    this.headers['content-Type'] = this.urlencodedType;
   }
   setReadTimeout(readTimeout: string): void {
     throw new Error('Method not implemented.');
@@ -70,19 +74,56 @@ export default class HttpClientImpl implements HttpClient {
       throw error as Error;
     }
   }
-  post(
-    endpoint: string,
-    params: Record<string, unknown>,
-    headers: Record<string, unknown>
-  ): unknown {
-    throw new Error('Method not implemented.');
+  async post<P, T>(endpoint: string, params: P): Promise<HttpResponse<T>> {
+    try {
+      const response = await axios.post<T>(endpoint, {
+        headers: this.headers,
+        baseURL: this.baseUrl,
+        params: {
+          apiKey: this.apikey,
+        },
+        data: params,
+      });
+
+      return {
+        status: response.status,
+        code: response.statusText,
+        data: response.data,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.toJSON());
+        throw error;
+      }
+      throw error as Error;
+    }
   }
-  patch(
+  async patch<P, T>(
     endpoint: string,
-    params: Record<string, unknown>,
-    headers: Record<string, unknown>
-  ): unknown {
-    throw new Error('Method not implemented.');
+    params: P // jsonでもurlencodedでもどうせstringだからstringで良い・・・？
+  ): Promise<HttpResponse<T>> {
+    try {
+      const response = await axios.patch<T>(endpoint, {
+        headers: this.headers,
+        baseURL: this.baseUrl,
+        params: {
+          apiKey: this.apikey,
+        },
+        data: params,
+      });
+
+      return {
+        status: response.status,
+        code: response.statusText,
+        data: response.data,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.toJSON());
+        throw error;
+      }
+      throw error as Error;
+    }
   }
   async put<P, T>(endpoint: string, body: P): Promise<HttpResponse<T>> {
     try {
@@ -108,8 +149,32 @@ export default class HttpClientImpl implements HttpClient {
       throw error as Error;
     }
   }
-  delete(endpoint: string, params: Record<string, unknown>): unknown {
-    throw new Error('Method not implemented.');
+  async delete<T>(
+    endpoint: string,
+    params?: Record<string, unknown>
+  ): Promise<HttpResponse<T>> {
+    try {
+      const response = await axios.delete<T>(endpoint, {
+        headers: this.headers,
+        baseURL: this.baseUrl,
+        params: {
+          ...params,
+          apiKey: this.apikey,
+        },
+      });
+
+      return {
+        status: response.status,
+        code: response.statusText,
+        data: response.data,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.toJSON());
+        throw error;
+      }
+      throw error as Error;
+    }
   }
   postMultiPart(endpoint: string, params: Record<string, unknown>): unknown {
     throw new Error('Method not implemented.');
