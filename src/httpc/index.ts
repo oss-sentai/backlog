@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ApiError } from '../exception/backlogApiError';
 import HttpClient, { HttpResponse } from './httpclient';
 
 interface HttpClientConfig {
@@ -22,6 +23,15 @@ export default class HttpClientImpl implements HttpClient {
   constructor(config: HttpClientConfig) {
     this.apikey = config.apikey;
     this.baseUrl = config.baseUrl;
+  }
+
+  private generateError(error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return new ApiError(error, error.response?.data?.errors);
+    }
+
+    const defaultError = error as Error;
+    return new ApiError(defaultError);
   }
 
   setApikey(apikey: string): void {
@@ -66,12 +76,8 @@ export default class HttpClientImpl implements HttpClient {
         code: response.statusText,
         data: response.data,
       };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.toJSON());
-        throw error;
-      }
-      throw error as Error;
+    } catch (error: unknown) {
+      throw this.generateError(error);
     }
   }
   async post<P, T>(endpoint: string, params: P): Promise<HttpResponse<T>> {
@@ -90,12 +96,8 @@ export default class HttpClientImpl implements HttpClient {
         code: response.statusText,
         data: response.data,
       };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.toJSON());
-        throw error;
-      }
-      throw error as Error;
+    } catch (error: unknown) {
+      throw this.generateError(error);
     }
   }
   async patch<P, T>(
@@ -117,12 +119,8 @@ export default class HttpClientImpl implements HttpClient {
         code: response.statusText,
         data: response.data,
       };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.toJSON());
-        throw error;
-      }
-      throw error as Error;
+    } catch (error: unknown) {
+      throw this.generateError(error);
     }
   }
   async put<P, T>(endpoint: string, body: P): Promise<HttpResponse<T>> {
@@ -141,12 +139,8 @@ export default class HttpClientImpl implements HttpClient {
         code: response.statusText,
         data: response.data,
       };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.toJSON());
-        throw error;
-      }
-      throw error as Error;
+    } catch (error: unknown) {
+      throw this.generateError(error);
     }
   }
   async delete<T>(
@@ -168,12 +162,8 @@ export default class HttpClientImpl implements HttpClient {
         code: response.statusText,
         data: response.data,
       };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.toJSON());
-        throw error;
-      }
-      throw error as Error;
+    } catch (error: unknown) {
+      throw this.generateError(error);
     }
   }
   postMultiPart(endpoint: string, params: Record<string, unknown>): unknown {

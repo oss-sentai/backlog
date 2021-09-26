@@ -1,4 +1,5 @@
 import WithSpace from './client/space';
+import WithUser from './client/user';
 import BacklogClient from './backlogClient';
 
-export default WithSpace(BacklogClient);
+export default WithUser(WithSpace(BacklogClient));
