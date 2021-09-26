@@ -84,6 +84,15 @@ export default class HttpClientImpl implements HttpClient {
     endpoint: string,
     params: URLSearchParams | string
   ): Promise<HttpResponse<T>> {
+    let addApiKeyParams: URLSearchParams | string = params;
+    if (typeof addApiKeyParams === 'string' && this.apikey) {
+      addApiKeyParams = params + '&apikey=' + this.apikey;
+    }
+
+    if (addApiKeyParams instanceof URLSearchParams && this.apikey) {
+      addApiKeyParams.append('apikey', this.apikey);
+    }
+
     try {
       const response = await axios.post<T>(endpoint, {
         headers: {
@@ -91,10 +100,7 @@ export default class HttpClientImpl implements HttpClient {
           'content-Type': 'application/x-www-form-urlencoded',
         },
         baseURL: this.baseUrl,
-        params: {
-          apiKey: this.apikey,
-        },
-        data: params,
+        params: addApiKeyParams,
       });
 
       return {
