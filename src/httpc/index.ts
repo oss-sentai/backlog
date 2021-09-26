@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { URLSearchParams } from 'url';
 import { ApiError } from '../exception/backlogApiError';
 import HttpClient, { HttpResponse } from './httpclient';
 
@@ -8,17 +9,13 @@ interface HttpClientConfig {
 }
 
 interface Headers {
-  'content-Type': string;
   Authorization?: string;
 }
 
 export default class HttpClientImpl implements HttpClient {
   private apikey?: string;
-  private headers: Headers = {
-    'content-Type': 'application/json;charset=utf-8',
-  };
   private baseUrl: string;
-  private urlencodedType = 'application/x-www-form-urlencoded';
+  private headers?: Headers;
 
   constructor(config: HttpClientConfig) {
     this.apikey = config.apikey;
@@ -38,10 +35,10 @@ export default class HttpClientImpl implements HttpClient {
     this.apikey = apikey;
   }
   setBearerToken(bearerToken: string): void {
-    this.headers.Authorization = 'Bearer ' + bearerToken;
-  }
-  setContentTypeByUrlencoded(): void {
-    this.headers['content-Type'] = this.urlencodedType;
+    this.headers = {
+      ...this,
+      Authorization: 'Bearer ' + bearerToken,
+    };
   }
   setReadTimeout(readTimeout: string): void {
     throw new Error('Method not implemented.');
@@ -62,7 +59,10 @@ export default class HttpClientImpl implements HttpClient {
   ): Promise<HttpResponse<T>> {
     try {
       const response = await axios.get<T>(endpoint, {
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          'content-Type': 'application/json;charset=utf-8',
+        },
         baseURL: this.baseUrl,
         params: {
           ...params,
@@ -80,10 +80,16 @@ export default class HttpClientImpl implements HttpClient {
       throw this.generateError(error);
     }
   }
-  async post<P, T>(endpoint: string, params: P): Promise<HttpResponse<T>> {
+  async post<T>(
+    endpoint: string,
+    params: URLSearchParams | string
+  ): Promise<HttpResponse<T>> {
     try {
       const response = await axios.post<T>(endpoint, {
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          'content-Type': 'application/x-www-form-urlencoded',
+        },
         baseURL: this.baseUrl,
         params: {
           apiKey: this.apikey,
@@ -100,13 +106,16 @@ export default class HttpClientImpl implements HttpClient {
       throw this.generateError(error);
     }
   }
-  async patch<P, T>(
+  async patch<T>(
     endpoint: string,
-    params: P // jsonでもurlencodedでもどうせstringだからstringで良い・・・？
+    params: URLSearchParams | string
   ): Promise<HttpResponse<T>> {
     try {
       const response = await axios.patch<T>(endpoint, {
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          'content-Type': 'application/x-www-form-urlencoded',
+        },
         baseURL: this.baseUrl,
         params: {
           apiKey: this.apikey,
@@ -126,7 +135,10 @@ export default class HttpClientImpl implements HttpClient {
   async put<P, T>(endpoint: string, body: P): Promise<HttpResponse<T>> {
     try {
       const response = await axios.put<T>(endpoint, {
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          'content-Type': 'application/json;charset=utf-8',
+        },
         baseURL: this.baseUrl,
         params: {
           apiKey: this.apikey,
@@ -149,7 +161,10 @@ export default class HttpClientImpl implements HttpClient {
   ): Promise<HttpResponse<T>> {
     try {
       const response = await axios.delete<T>(endpoint, {
-        headers: this.headers,
+        headers: {
+          ...this.headers,
+          'content-Type': 'application/json;charset=utf-8',
+        },
         baseURL: this.baseUrl,
         params: {
           ...params,
@@ -168,5 +183,48 @@ export default class HttpClientImpl implements HttpClient {
   }
   postMultiPart(endpoint: string, params: Record<string, unknown>): unknown {
     throw new Error('Method not implemented.');
+  }
+
+  // Doc: https://developer.nulab.com/ja/docs/backlog/tips/#
+  generateURLSearchParams(arg: Record<string, unknown>) {
+    const isObject = (x: unknown): x is Record<string, unknown> =>
+      x !== null && (typeof x === 'object' || typeof x === 'function');
+    const params = new URLSearchParams();
+
+    const fromObject = (obj: Record<string, unknown>) => {
+      Object.entries(obj).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          fromArray(key, value);
+          return;
+        }
+
+        params.append(`${key}[]`, `${value}`);
+      });
+    };
+
+    const fromArray = (key: string, values: unknown[]) => {
+      values.forEach((item) => {
+        if (item === undefined || item === null) {
+          return;
+        }
+
+        // NOTE: backlogの仕様上存在しないはず
+        if (isObject(item)) {
+          throw Error('Illegal parameters');
+        }
+
+        params.append(`${key}[]`, `${item}`);
+      });
+
+      return params;
+    };
+
+    fromObject(arg);
+
+    return params;
   }
 }
