@@ -49,13 +49,12 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
     }
 
     async createUser(params: CreateUserParams): Promise<User> {
-      this.httpClient.setContentTypeByUrlencoded();
       const requestData = new url.URLSearchParams({
         ...params,
         roleType: params.roleType.toString(), // TODO: これ大丈夫？？
       });
 
-      const { data } = await this.httpClient.post<string, User>(
+      const { data } = await this.httpClient.post<User>(
         '/api/v2/users',
         requestData.toString()
       );
@@ -63,13 +62,12 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
     }
 
     async updateUser(userId: number, params: UpdateUserParams): Promise<User> {
-      this.httpClient.setContentTypeByUrlencoded();
       const requestData = new url.URLSearchParams({
         ...params,
         roleType: params.roleType.toString(),
       });
 
-      const { data } = await this.httpClient.patch<string, User>(
+      const { data } = await this.httpClient.patch<User>(
         `/api/v2/users/${userId}`,
         requestData.toString()
       );
