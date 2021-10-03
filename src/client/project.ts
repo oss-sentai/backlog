@@ -56,7 +56,6 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
       const { data } = await this.httpClient.get<Project>(
         `/api/v2/projects/${projectIdOrKey}`
       );
-
       return data;
     }
 
@@ -73,7 +72,6 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
         '/api/v2/projects',
         requestData.toString()
       );
-
       return data;
     }
 
@@ -94,7 +92,6 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
         `/api/v2/projects/${projectIdOrKey}`,
         requestData.toString()
       );
-
       return data;
     }
 
@@ -102,7 +99,6 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
       const { data } = await this.httpClient.delete<Project>(
         `/api/v2/projects/${projectIdOrKey}`
       );
-
       return data;
     }
   };
