@@ -22,12 +22,25 @@ export interface CreateProjectParams {
   textFormattingRule?: string;
 }
 
+export interface UpdateProjectParams {
+  name?: string;
+  key?: string;
+  chartEnabled?: boolean;
+  projectLeaderCanEditProjectLeader?: boolean;
+  subtaskingEnabled?: boolean;
+  textFormattingRule?: string;
+  archived?: boolean;
+}
+
 interface ProjectInterface {
   getProjectList(): Promise<Project[]>;
   getProjectInfo(projectIdOrKey: string): Promise<Project>;
   createProject(params: CreateProjectParams): Promise<Project>;
-  // updateUser(userId: number, params: UpdateUserParams): Promise<User>;
-  // deleteUser(userId: number): Promise<User>;
+  updateProject(
+    projectIdOrKey: string,
+    params: UpdateProjectParams
+  ): Promise<Project>;
+  deleteProject(projectIdOrKey: string): Promise<Project>;
 }
 
 export default <T extends Constructor<BacklogClient>>(Base: T) =>
@@ -59,6 +72,35 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
       const { data } = await this.httpClient.post<Project>(
         '/api/v2/projects',
         requestData.toString()
+      );
+
+      return data;
+    }
+
+    async updateProject(
+      projectIdOrKey: string,
+      params: UpdateProjectParams
+    ): Promise<Project> {
+      const requestData = new url.URLSearchParams({
+        ...params,
+        chartEnabled: params.chartEnabled?.toString(),
+        subtaskingEnabled: params.subtaskingEnabled?.toString(),
+        projectLeaderCanEditProjectLeader:
+          params.projectLeaderCanEditProjectLeader?.toString(),
+        archived: params.archived?.toString(),
+      }); // TODO: これ大丈夫？？
+
+      const { data } = await this.httpClient.post<Project>(
+        `/api/v2/projects/${projectIdOrKey}`,
+        requestData.toString()
+      );
+
+      return data;
+    }
+
+    async deleteProject(projectIdOrKey: string): Promise<Project> {
+      const { data } = await this.httpClient.delete<Project>(
+        `/api/v2/projects/${projectIdOrKey}`
       );
 
       return data;
