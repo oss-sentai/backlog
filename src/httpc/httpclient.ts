@@ -10,8 +10,7 @@ export default interface HttpClient {
 
   get<T>(
     endpoint: string,
-    params?: Record<string, unknown>,
-    queryParams?: Record<string, unknown>
+    params?: Record<string, unknown>
   ): Promise<HttpResponse<T>>;
   post<T>(
     endpoint: string,

@@ -10,6 +10,19 @@ type User = {
   mailAddress: string;
 };
 
+export type GetIssuesParams = {
+  projectId?: number[];
+  issueTypeId?: number[];
+  categoryId?: number[];
+  versionId?: number[];
+  milestoneId?: number[];
+  statusId?: number[];
+  priorityId?: number[];
+  assigneeId?: number[];
+  createdUserId?: number[];
+  resolutionId?: number[];
+};
+
 // TODO: add custom Field
 export type CreateIssueParams = {
   projectId: number;
@@ -83,5 +96,21 @@ export type Issue = {
     size: number;
   }[];
   sharedFiles: unknown[];
-  stars: unknown[];
+  stars: Star[];
+};
+
+type Star = {
+  id: number;
+  comment: string | null;
+  url: string;
+  title: string;
+  presenter: {
+    id: number;
+    userId: string;
+    name: string;
+    roleType: number;
+    lang: string;
+    mailAddress: string;
+  };
+  created: string;
 };

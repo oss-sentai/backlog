@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "run": "yarn build && node lib/index.js", 
     "build": "tsc --project tsconfig.build.json",
     "clean": "rm -rf lib",
     "test": "jest",
