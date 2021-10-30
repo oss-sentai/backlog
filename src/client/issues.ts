@@ -10,6 +10,7 @@ interface Issues {
   createIssue(params: CreateIssueParams): Promise<Issue>;
   getIssue(idOrKey: string): Promise<Issue>;
   getIssues(params: GetIssuesParams): Promise<Issue[]>;
+  deleteIsseue(issueIdOrKey: string): Promise<Issue>;
 }
 
 export default <T extends Constructor<BacklogClient>>(Base: T) =>
@@ -34,6 +35,14 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
         '/api/v2/issues',
         this.httpClient.generateURLSearchParams(params)
       );
+      return data;
+    }
+
+    async deleteIsseue(issueIdOrKey: string): Promise<Issue> {
+      const { data } = await this.httpClient.delete<Issue>(
+        '/api/v2/issues/' + issueIdOrKey
+      );
+
       return data;
     }
   };
