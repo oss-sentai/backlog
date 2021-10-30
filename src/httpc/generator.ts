@@ -18,25 +18,11 @@ export default class Generator {
   ) {
     const params = new URLSearchParams();
 
-    const fromArray = (key: string, values: (number | string)[]) => {
-      values.forEach((item) => {
-        if (item === undefined || item === null) {
-          return;
-        }
-
-        params.append(`${key}[]`, `${item}`);
-      });
-
-      return params;
-    };
-
     Object.entries(arg).forEach(([key, value]) => {
-      if (value === undefined || value === null) {
-        return;
-      }
-
       if (Array.isArray(value)) {
-        fromArray(key, value);
+        value.forEach((item) => {
+          params.append(`${key}[]`, `${item}`);
+        });
         return;
       }
 
