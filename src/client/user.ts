@@ -40,6 +40,7 @@ interface UserInterface {
   createUser(params: CreateUserParams): Promise<User>;
   updateUser(userId: number, params: UpdateUserParams): Promise<User>;
   deleteUser(userId: number): Promise<User>;
+  getMySelf(): Promise<User>;
 }
 
 export default <T extends Constructor<BacklogClient>>(Base: T) =>
@@ -76,6 +77,11 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
       const { data } = await this.httpClient.delete<User>(
         `/api/v2/users/${userId}`
       );
+      return data;
+    }
+
+    async getMySelf(): Promise<User> {
+      const { data } = await this.httpClient.get<User>(`/api/v2/users/myself`);
       return data;
     }
   };
