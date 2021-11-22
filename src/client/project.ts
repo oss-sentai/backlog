@@ -39,10 +39,10 @@ interface ProjectInterface {
   getProjectList(): Promise<Project[]>;
   getProjectInfo(projectIdOrKey: string): Promise<Project>;
   createProject(params: CreateProjectParams): Promise<Project>;
-  // updateProject(
-  //   projectIdOrKey: string,
-  //   params: UpdateProjectParams
-  // ): Promise<Project>;
+  updateProject(
+    projectIdOrKey: string,
+    params: UpdateProjectParams
+  ): Promise<Project>;
   deleteProject(projectIdOrKey: string): Promise<Project>;
 }
 

@@ -5,10 +5,6 @@ import { ApiError } from '../exception/backlogApiError';
 export default class Generator {
   protected generateError(error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.log('===============');
-      console.log(error.request);
-      console.log('===============');
-      console.log(error.response);
       return new ApiError(error, error.response?.data?.errors);
     }
 
