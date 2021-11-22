@@ -1,30 +1,38 @@
 import { Constructor } from './../utils';
 import BacklogClient from '../backlogClient';
-import url from 'url';
 
-export interface User {
+enum ROLE_TYPE {
+  ADOMIN = 1,
+  USER,
+  REPORTER,
+  VIEWER,
+  GUEST_REPORTER,
+  GUEST_VIEWER,
+}
+
+export type User = {
   id: number;
   userId: string;
   name: string;
-  roleType: number; // ここnumberで良い？？
+  roleType: ROLE_TYPE;
   lang: string | null;
   mailAddress: string;
-}
+};
 
-export interface CreateUserParams {
+export type CreateUserParams = {
   userId: string;
   password: string;
   name: string;
   mailAddress: string;
-  roleType: number;
-}
+  roleType: ROLE_TYPE;
+};
 
-export interface UpdateUserParams {
+export type UpdateUserParams = {
   password: string;
   name: string;
   mailAddress: string;
-  roleType: number;
-}
+  roleType: ROLE_TYPE;
+};
 
 interface UserInterface {
   getUserList(): Promise<User[]>;
@@ -49,27 +57,17 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
     }
 
     async createUser(params: CreateUserParams): Promise<User> {
-      const requestData = new url.URLSearchParams({
-        ...params,
-        roleType: params.roleType.toString(), // TODO: これ大丈夫？？
-      });
-
       const { data } = await this.httpClient.post<User>(
         '/api/v2/users',
-        requestData.toString()
+        this.httpClient.generateURLSearchParams(params)
       );
       return data;
     }
 
     async updateUser(userId: number, params: UpdateUserParams): Promise<User> {
-      const requestData = new url.URLSearchParams({
-        ...params,
-        roleType: params.roleType.toString(),
-      });
-
       const { data } = await this.httpClient.patch<User>(
         `/api/v2/users/${userId}`,
-        requestData.toString()
+        this.httpClient.generateURLSearchParams(params)
       );
       return data;
     }
