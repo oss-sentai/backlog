@@ -2,29 +2,29 @@ import { Constructor } from './../utils';
 import BacklogClient from '../backlogClient';
 import url from 'url';
 
-export interface User {
+export type User = {
   id: number;
   userId: string;
   name: string;
   roleType: number; // ここnumberで良い？？
   lang: string | null;
   mailAddress: string;
-}
+};
 
-export interface CreateUserParams {
+export type CreateUserParams = {
   userId: string;
   password: string;
   name: string;
   mailAddress: string;
   roleType: number;
-}
+};
 
-export interface UpdateUserParams {
+export type UpdateUserParams = {
   password: string;
   name: string;
   mailAddress: string;
   roleType: number;
-}
+};
 
 interface UserInterface {
   getUserList(): Promise<User[]>;
@@ -49,14 +49,9 @@ export default <T extends Constructor<BacklogClient>>(Base: T) =>
     }
 
     async createUser(params: CreateUserParams): Promise<User> {
-      const requestData = new url.URLSearchParams({
-        ...params,
-        roleType: params.roleType.toString(), // TODO: これ大丈夫？？
-      });
-
       const { data } = await this.httpClient.post<User>(
         '/api/v2/users',
-        requestData.toString()
+        this.httpClient.generateURLSearchParams(params)
       );
       return data;
     }
