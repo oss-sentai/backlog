@@ -14,7 +14,7 @@ export default class Generator {
 
   // Doc: https://developer.nulab.com/ja/docs/backlog/tips/#
   generateURLSearchParams(
-    arg: Record<string, number | string | (number | string)[]>
+    arg: Record<string, number | string | boolean | (number | string)[]>
   ) {
     const params = new URLSearchParams();
 

@@ -100,22 +100,27 @@ export default class HttpClientImpl extends Generator implements HttpClient {
     params: URLSearchParams | string
   ): Promise<HttpResponse<T>> {
     try {
-      const response = await axios.patch<T>(endpoint, {
-        headers: {
-          ...this.headers,
-          'content-Type': 'application/x-www-form-urlencoded',
-        },
-        baseURL: this.baseUrl,
-        params: {
-          apiKey: this.apikey,
-        },
-        data: params,
-      });
+      // NOTE: If it is an axios patch request, it will fail, so it corresponds to node fetch.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fetch = require('node-fetch');
+      const response = await fetch(
+        this.baseUrl + endpoint + `?apiKey=${this.apikey}`,
+        {
+          method: 'PATCH',
+          headers: {
+            ...this.headers,
+            'content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: params,
+        }
+      );
+
+      const data = (await response.json()) as T;
 
       return {
         status: response.status,
         code: response.statusText,
-        data: response.data,
+        data,
       };
     } catch (error: unknown) {
       throw this.generateError(error);
